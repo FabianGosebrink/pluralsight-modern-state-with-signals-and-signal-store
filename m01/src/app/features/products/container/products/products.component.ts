@@ -1,6 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { JsonPipe } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { Product } from '../../../../shared/models/product.models';
 import { CategoryNamePipe } from '../../../../shared/pipes/category-name.pipe';
@@ -10,22 +9,21 @@ import { ProductsService } from '../../service/products.service';
 
 @Component({
   selector: 'app-products',
-  imports: [ProductCategoryComponent, CategoryNamePipe, JsonPipe],
+  imports: [ProductCategoryComponent, CategoryNamePipe],
   templateUrl: './products.component.html',
-  styleUrl: './products.component.scss'
+  styleUrl: './products.component.scss',
 })
 export class ProductsComponent implements OnInit {
-  products = signal<{ category: string; products: Product[]; }[]>([]);
+  products = signal<{ category: string; products: Product[] }[]>([]);
   private readonly productsService = inject(ProductsService);
   private readonly checkoutService = inject(CheckoutService);
   private readonly toastrService = inject(ToastrService);
   private readonly router = inject(Router);
 
   ngOnInit() {
-    this.productsService
-      .loadProducts()
-      .subscribe((products) => {
-        const categoryProductMap = products.reduce((result: Record<string, Product[]>, product) => {
+    this.productsService.loadProducts().subscribe((products) => {
+      const categoryProductMap = products.reduce(
+        (result: Record<string, Product[]>, product) => {
           const category = product.category;
 
           if (!result[category]) {
@@ -35,16 +33,19 @@ export class ProductsComponent implements OnInit {
           result[category].push(product);
 
           return result;
-        }, {});
+        },
+        {},
+      );
 
-
-        const groupedByCategory = Object.keys(categoryProductMap).map((category) => ({
+      const groupedByCategory = Object.keys(categoryProductMap).map(
+        (category) => ({
           category,
-          products: categoryProductMap[category]
-        }));
+          products: categoryProductMap[category],
+        }),
+      );
 
-        this.products.set(groupedByCategory);
-      });
+      this.products.set(groupedByCategory);
+    });
   }
 
   onProductClicked(id: string): void {
