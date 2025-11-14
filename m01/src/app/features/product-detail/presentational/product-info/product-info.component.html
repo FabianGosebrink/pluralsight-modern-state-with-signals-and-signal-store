@@ -6,5 +6,5 @@
     </div>
     <div class="price">{{ product().price | currency: "CHF " }}</div>
   </div>
-  <app-add-to-cart-button (clicked)="onAddToCartClicked()" />
+  <app-add-to-cart-button (clicked)="addToCartClicked.emit(product())" />
 </div>
