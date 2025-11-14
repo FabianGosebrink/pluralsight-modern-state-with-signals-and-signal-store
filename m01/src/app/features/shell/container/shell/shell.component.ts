@@ -1,18 +1,12 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { CheckoutService } from '../../../../shared/services/checkout.service';
 import { HeaderComponent } from '../../presentational/header/header.component';
-import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-shell',
   imports: [HeaderComponent, RouterOutlet],
-  template: `
-    <app-header class="header" [cartProductsCount]="cartProductsCount()" />
-
-    <div class="content">
-      <router-outlet />
-    </div>
-  `,
+  templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
 })
 export class ShellComponent implements OnInit {
