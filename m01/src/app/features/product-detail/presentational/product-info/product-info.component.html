@@ -4,7 +4,7 @@
     <div>
       <i>{{ product().category | categoryName }}</i>
     </div>
-    <div class="price">{{ product().price | currency: "EUR" }}</div>
+    <div class="price">{{ product().price | currency: "CHF " }}</div>
   </div>
   <app-add-to-cart-button (clicked)="onAddToCartClicked()" />
 </div>

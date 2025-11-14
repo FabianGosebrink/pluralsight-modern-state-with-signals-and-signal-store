@@ -5,7 +5,7 @@
   <div class="product-info">
     <strong>{{ product().name }}</strong>
     <div class="price-actions">
-      <div>{{ product().price | currency: "EUR" }}</div>
+      <div>{{ product().price | currency: "CHF " }}</div>
       <a class="cart-icon" (click)="onCartClick($event)">
         <svg
           fill="currentColor"
