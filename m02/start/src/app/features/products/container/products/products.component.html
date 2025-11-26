@@ -1,0 +1,10 @@
+<div class="products-list">
+  @for (productCategory of products(); track productCategory.category) {
+    <app-product-category
+      (cartClicked)="onCartClicked($event)"
+      (clicked)="onProductClicked($event)"
+      [categoryName]="productCategory.category | categoryName"
+      [products]="productCategory.products"
+    />
+  }
+</div>
