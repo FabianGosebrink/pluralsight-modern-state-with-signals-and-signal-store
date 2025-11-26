@@ -1,6 +1,5 @@
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 
-
 type CheckoutState = {
   productIds: string[];
 };
