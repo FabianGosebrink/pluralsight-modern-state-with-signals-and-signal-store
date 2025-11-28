@@ -1,8 +1,8 @@
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
-import { CATEGORY_NAME_MAP, GlobalProductsStore } from '../../../../shared/state/global-products.store';
+import { GlobalProductsStore } from '../../../../shared/state/global-products.store';
 import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.store';
-import { Product, ProductCategory } from '../../../../shared/models/product.models';
+import { Product } from '../../../../shared/models/product.models';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { exhaustMap, filter, pipe, tap } from 'rxjs';
 import { ProductsService } from '../../../../shared/services/products.service';
@@ -10,18 +10,17 @@ import { tapResponse } from '@ngrx/operators';
 
 export const ProductDetailStore = signalStore(
   withState({
+    _product: null as Product | null,
     productId: null as string | null
   }),
   withComputed((store, globalProductsStore = inject(GlobalProductsStore)) => ({
     productDetail: computed(() => {
       const productId = store.productId();
+      const product = store._product();
+
       const existingProduct = globalProductsStore.products().find(x => x.id === productId);
 
-      if (existingProduct) {
-        return { ...existingProduct, category: CATEGORY_NAME_MAP[existingProduct.category as ProductCategory] };
-      }
-
-      return null;
+      return existingProduct ?? product;
     })
   })),
   withMethods(
@@ -41,7 +40,7 @@ export const ProductDetailStore = signalStore(
           exhaustMap((id) =>
             productsService.loadSingleProduct(id).pipe(
               tapResponse({
-                next: (product) => globalProductsStore.add(product),
+                next: (product) => patchState(store, { _product: product }),
                 error: console.error
               })
             )

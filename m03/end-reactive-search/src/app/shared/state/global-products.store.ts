@@ -1,16 +1,10 @@
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { Product, ProductCategory } from '../models/product.models';
+import { Product } from '../models/product.models';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { exhaustMap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, exhaustMap, pipe } from 'rxjs';
 import { ProductsService } from '../services/products.service';
 import { inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
-
-export const CATEGORY_NAME_MAP: Record<ProductCategory, string> = {
-  ['book_fantasy']: 'Fantasy Books',
-  ['book_history']: 'History Books',
-  ['book_romance']: 'Romance Books'
-};
 
 type ProductsState = {
   products: Product[];
@@ -25,20 +19,18 @@ export const GlobalProductsStore = signalStore(
   withState(initialProductsState),
   withMethods(
     (store, productsService = inject(ProductsService)) => ({
-      getAll: rxMethod<void>(
-        exhaustMap(() =>
-          productsService.loadProducts().pipe(
+      loadByQuery: rxMethod<string>(
+        pipe(
+          debounceTime(300),
+          distinctUntilChanged(),
+          exhaustMap((query) => productsService.loadProducts(query).pipe(
             tapResponse({
-              next: (products) =>
-                patchState(store, { products }),
+              next: (products) => patchState(store, { products }),
               error: console.error
             })
-          )
+          ))
         )
-      ),
-      add(product: Product) {
-        patchState(store, { products: [...store.products(), product] });
-      }
+      )
     })
   )
 );

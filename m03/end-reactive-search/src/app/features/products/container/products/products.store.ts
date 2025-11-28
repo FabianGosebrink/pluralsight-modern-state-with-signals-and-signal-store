@@ -1,13 +1,21 @@
-import { signalStore, withComputed, withHooks, withMethods } from '@ngrx/signals';
+import { patchState, signalMethod, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
-import { CATEGORY_NAME_MAP, GlobalProductsStore } from '../../../../shared/state/global-products.store';
+import { GlobalProductsStore } from '../../../../shared/state/global-products.store';
 import { Product, ProductCategory } from '../../../../shared/models/product.models';
 import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.store';
 import { Router } from '@angular/router';
 
+const CATEGORY_NAME_MAP: Record<ProductCategory, string> = {
+  ['book_fantasy']: 'Fantasy Books',
+  ['book_history']: 'History Books',
+  ['book_romance']: 'Romance Books'
+};
 
 export const ProductsStore = signalStore(
-  withComputed((_store, globalProductsStore = inject(GlobalProductsStore)) => ({
+  withState({
+    searchTerm: ''
+  }),
+  withComputed((store, globalProductsStore = inject(GlobalProductsStore)) => ({
     productsByCategories: computed(() => {
       const products = globalProductsStore.products();
       const productsByCategory = products.reduce(
@@ -32,21 +40,28 @@ export const ProductsStore = signalStore(
   })),
   withMethods(
     (
-      _store,
+      store,
       globalCheckoutStore = inject(GlobalCheckoutStore),
+      globalProductsStore = inject(GlobalProductsStore),
       router = inject(Router)
     ) => ({
       addToCart(product: Product) {
         globalCheckoutStore.addToCart(product);
       },
+      loadByQuery: signalMethod<string>((query) => {
+        globalProductsStore.loadByQuery(query);
+      }),
       onProductClicked(id: string): void {
         router.navigate(['products', id]);
+      },
+      setSearchTerm(term: string) {
+        patchState(store, { searchTerm: term });
       }
     })
   ),
   withHooks({
-    onInit(_, globalProductsStore = inject(GlobalProductsStore)) {
-      globalProductsStore.getAll();
+    onInit(store, globalProductsStore = inject(GlobalProductsStore)) {
+      globalProductsStore.loadByQuery(store.searchTerm());
     }
   })
 );

@@ -1,21 +1,23 @@
-import { signalStore, withComputed, withMethods } from '@ngrx/signals';
+import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
-import { GlobalProductsStore } from '../../../../shared/state/global-products.store';
-import { Product, ProductCategory } from '../../../../shared/models/product.models';
+import { CATEGORY_NAME_MAP, Product, ProductCategory, PRODUCTS } from '../../../../shared/models/product.models';
 import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.store';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 
-const CATEGORY_NAME_MAP: Record<ProductCategory, string> = {
-  ['book_fantasy']: 'Fantasy Books',
-  ['book_history']: 'History Books',
-  ['book_romance']: 'Romance Books'
+type ProductsState = {
+  products: Product[];
+};
+
+const initialProductsState: ProductsState = {
+  products: []
 };
 
 export const ProductsStore = signalStore(
-  withComputed((_store, globalProductsStore = inject(GlobalProductsStore)) => ({
+  withState(initialProductsState),
+  withComputed((store) => ({
     productsByCategories: computed(() => {
-      const products = globalProductsStore.products();
+      const products = store.products();
       const productsByCategory = products.reduce(
         (result: Record<string, Product[]>, product: Product) => {
           const { category } = product;
@@ -38,11 +40,14 @@ export const ProductsStore = signalStore(
   })),
   withMethods(
     (
-      _store,
+      store,
       globalCheckoutStore = inject(GlobalCheckoutStore),
       toastrService = inject(ToastrService),
       router = inject(Router)
     ) => ({
+      getAll() {
+        patchState(store, { products: PRODUCTS });
+      },
       addToCart(product: Product) {
         globalCheckoutStore.addToCart(product);
         toastrService.success('Item Added to Cart');
