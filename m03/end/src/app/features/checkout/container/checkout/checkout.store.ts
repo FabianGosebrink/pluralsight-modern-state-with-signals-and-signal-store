@@ -1,4 +1,4 @@
-import { signalStore, withComputed, withHooks, withMethods } from '@ngrx/signals';
+import { signalStore, withComputed, withMethods } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
 import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.store';
 import { Product } from '../../../../shared/models/product.models';
@@ -21,12 +21,7 @@ export const CheckoutStore = signalStore(
         globalCheckoutStore.removeFromCart(index);
       }
     })
-  ),
-  withHooks({
-    onInit(_, globalCheckoutStore = inject(GlobalCheckoutStore)) {
-      globalCheckoutStore.loadAll();
-    }
-  })
+  )
 );
 
 function calculateTotalAmount(products: Product[]) {

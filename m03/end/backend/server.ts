@@ -38,17 +38,27 @@ const writeJSON = async <T>(filename: string, data: T): Promise<void> => {
 // Wrapper to handle async errors correctly
 const asyncHandler =
   (fn: express.RequestHandler): express.RequestHandler =>
-  (req, res, next) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
+    (req, res, next) => {
+      Promise.resolve(fn(req, res, next)).catch(next);
+    };
 
 // Get all products
 app.get(
   '/products',
   asyncHandler(async (req, res) => {
+    const { query } = req.query;
     const products = await readJSON<Product[]>('products.json');
-    res.json(products);
-  }),
+
+    if (!query || typeof query !== 'string') {
+      res.json(products);
+      return;
+    }
+
+    const filteredProducts = products.filter((p) =>
+      p.name.toLowerCase().includes(query.toLowerCase())
+    );
+    res.json(filteredProducts);
+  })
 );
 
 app.get(
@@ -64,7 +74,7 @@ app.get(
     }
 
     res.json(product);
-  }),
+  })
 );
 
 // Get current cart
@@ -73,7 +83,7 @@ app.get(
   asyncHandler(async (req, res) => {
     const cart = await readJSON<Product[]>('cart.json');
     res.json(cart);
-  }),
+  })
 );
 
 // Add product to cart
@@ -93,7 +103,7 @@ app.post(
     cart.push(product);
     await writeJSON('cart.json', cart);
     res.status(201).json(cart);
-  }),
+  })
 );
 
 // Remove product from cart
@@ -112,7 +122,7 @@ app.delete(
     cart.splice(index, 1);
     await writeJSON('cart.json', cart);
     res.status(200).json(cart);
-  }),
+  })
 );
 
 // Start server

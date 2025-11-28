@@ -1,4 +1,4 @@
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
+import { patchState, signalStore, withHooks, withMethods, withState } from '@ngrx/signals';
 import { Product } from '../models/product.models';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { exhaustMap } from 'rxjs';
@@ -34,7 +34,7 @@ export const GlobalCheckoutStore = signalStore(
           )
         )
       ),
-      
+
       addToCart: rxMethod<Product>(
         exhaustMap((product) =>
           checkoutService.addToCart(product).pipe(
@@ -69,5 +69,10 @@ export const GlobalCheckoutStore = signalStore(
         )
       )
     })
-  )
+  ),
+  withHooks({
+    onInit({ loadAll }) {
+      loadAll();
+    }
+  })
 );
