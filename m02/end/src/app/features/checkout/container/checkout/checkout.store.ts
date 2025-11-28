@@ -2,7 +2,6 @@ import { signalStore, withComputed, withMethods } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
 import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.store';
 import { Product } from '../../../../shared/models/product.models';
-import { ToastrService } from 'ngx-toastr';
 
 
 export const CheckoutStore = signalStore(
@@ -16,11 +15,10 @@ export const CheckoutStore = signalStore(
   }),
   withMethods(
     (
-      _store, globalCheckoutStore = inject(GlobalCheckoutStore), toastrService = inject(ToastrService)
+      _store, globalCheckoutStore = inject(GlobalCheckoutStore)
     ) => ({
       removeFromCart(index: number) {
         globalCheckoutStore.removeFromCart(index);
-        toastrService.success('Item removed from Cart');
       }
     })
   )
