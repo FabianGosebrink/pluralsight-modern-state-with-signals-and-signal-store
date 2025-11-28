@@ -24,7 +24,7 @@ export const ProductDetailStore = signalStore(
         patchState(store, { productId });
       },
       addToCart(product: Product) {
-        globalCheckoutStore.addToCart(product.id);
+        globalCheckoutStore.addToCart(product);
       }
     })
   )

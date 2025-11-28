@@ -38,10 +38,13 @@ export const ProductsStore = signalStore(
   })),
   withMethods(
     (
-      _store, globalCheckoutStore = inject(GlobalCheckoutStore), toastrService = inject(ToastrService), router = inject(Router)
+      _store,
+      globalCheckoutStore = inject(GlobalCheckoutStore),
+      toastrService = inject(ToastrService),
+      router = inject(Router)
     ) => ({
       addToCart(product: Product) {
-        globalCheckoutStore.addToCart(product.id);
+        globalCheckoutStore.addToCart(product);
         toastrService.success('Item Added to Cart');
       },
       onProductClicked(id: string): void {

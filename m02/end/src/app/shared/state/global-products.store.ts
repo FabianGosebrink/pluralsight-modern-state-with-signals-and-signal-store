@@ -142,9 +142,7 @@ export const GlobalProductsStore = signalStore(
   { providedIn: 'root' },
   withState(initialProductsState),
   withMethods(
-    (
-      store
-    ) => ({
+    (store) => ({
       getAll() {
         patchState(store, { products: PRODUCTS });
       }

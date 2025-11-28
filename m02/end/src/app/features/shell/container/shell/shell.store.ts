@@ -4,6 +4,6 @@ import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.st
 
 export const ShellStore = signalStore(
   withComputed((_store, globalCheckoutStore = inject(GlobalCheckoutStore)) => ({
-    cartProductsCount: computed(() => globalCheckoutStore.productIds().length)
+    cartProductsCount: computed(() => globalCheckoutStore.products().length)
   }))
 );

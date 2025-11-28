@@ -1,11 +1,12 @@
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
+import { Product } from '../models/product.models';
 
 type CheckoutState = {
-  productIds: string[];
+  products: Product[];
 };
 
 const initialCheckoutState: CheckoutState = {
-  productIds: []
+  products: []
 };
 
 export const GlobalCheckoutStore = signalStore(
@@ -15,11 +16,11 @@ export const GlobalCheckoutStore = signalStore(
     (
       store
     ) => ({
-      addToCart(productId: string) {
-        patchState(store, { productIds: [...store.productIds(), productId] });
+      addToCart(product: Product) {
+        patchState(store, { products: [...store.products(), product] });
       },
       removeFromCart(index: number) {
-        patchState(store, { productIds: store.productIds().filter((_, i) => i !== index) });
+        patchState(store, { products: store.products().filter((_, i) => i !== index) });
       }
     })
   )
