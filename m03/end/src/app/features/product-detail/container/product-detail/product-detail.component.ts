@@ -16,6 +16,6 @@ export class ProductDetailComponent implements OnInit {
   id = input.required<string>();
 
   ngOnInit() {
-    this.store.loadProductIfNotLoaded(this.id());
+    this.store.loadProductIfNotLoaded(this.id);
   }
 }
