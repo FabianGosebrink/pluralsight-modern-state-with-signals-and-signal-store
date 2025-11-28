@@ -1,7 +1,7 @@
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { CATEGORY_NAME_MAP, Product, ProductCategory, PRODUCTS } from '../../../../shared/models/product.models';
 import { computed, inject } from '@angular/core';
-import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.store';
+import { GlobalCheckoutStore } from '../../../../shared/store/global-checkout.store';
 
 type ProductDetailState = {
   product: Product | null;

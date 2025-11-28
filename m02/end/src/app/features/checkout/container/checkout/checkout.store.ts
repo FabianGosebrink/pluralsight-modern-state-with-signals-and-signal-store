@@ -1,6 +1,6 @@
 import { signalStore, withComputed, withMethods } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
-import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.store';
+import { GlobalCheckoutStore } from '../../../../shared/store/global-checkout.store';
 import { Product } from '../../../../shared/models/product.models';
 
 
