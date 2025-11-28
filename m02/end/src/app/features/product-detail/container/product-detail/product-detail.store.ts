@@ -1,6 +1,7 @@
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
-import { Product, PRODUCTS } from '../../../../shared/models/product.models';
-import { computed } from '@angular/core';
+import { CATEGORY_NAME_MAP, Product, ProductCategory, PRODUCTS } from '../../../../shared/models/product.models';
+import { computed, inject } from '@angular/core';
+import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.store';
 
 type ProductDetailState = {
   product: Product | null;
@@ -14,16 +15,24 @@ export const ProductDetailStore = signalStore(
   withState<ProductDetailState>(initialProductDetailState),
   withComputed((store) => ({
     productDetail: computed(() => {
-      const existingProduct = globalProductsStore.products().find(x => x.id === productId);
+      const existingProduct = store.product();
 
-      return existingProduct ?? product;
+      if (existingProduct) {
+        return { ...existingProduct, category: CATEGORY_NAME_MAP[existingProduct.category as ProductCategory] };
+      }
+
+      return null;
     })
   })),
-  withMethods((store) => ({
+  withMethods((store,
+               globalCheckoutStore = inject(GlobalCheckoutStore)) => ({
     loadProduct(id: string) {
-      const product = PRODUCTS.find(p => p.id === '1');
+      const product = PRODUCTS.find(p => p.id === id);
 
       patchState(store, { product });
+    },
+    addToCart(product: Product) {
+      globalCheckoutStore.addToCart(product);
     }
   }))
 );

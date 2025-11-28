@@ -1,8 +1,7 @@
-import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
+import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
 import { CATEGORY_NAME_MAP, Product, ProductCategory, PRODUCTS } from '../../../../shared/models/product.models';
 import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.store';
-import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 
 type ProductsState = {
@@ -42,7 +41,6 @@ export const ProductsStore = signalStore(
     (
       store,
       globalCheckoutStore = inject(GlobalCheckoutStore),
-      toastrService = inject(ToastrService),
       router = inject(Router)
     ) => ({
       getAll() {
@@ -50,11 +48,15 @@ export const ProductsStore = signalStore(
       },
       addToCart(product: Product) {
         globalCheckoutStore.addToCart(product);
-        toastrService.success('Item Added to Cart');
       },
       onProductClicked(id: string): void {
         router.navigate(['products', id]);
       }
     })
-  )
+  ),
+  withHooks({
+    onInit(store) {
+      store.getAll();
+    }
+  })
 );
