@@ -1,8 +1,8 @@
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
-import { CATEGORY_NAME_MAP, GlobalProductsStore } from '../../../../shared/state/global-products.store';
+import { GlobalProductsStore } from '../../../../shared/state/global-products.store';
 import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.store';
-import { Product, ProductCategory } from '../../../../shared/models/product.models';
+import { Product } from '../../../../shared/models/product.models';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { exhaustMap, filter, pipe, tap } from 'rxjs';
 import { ProductsService } from '../../../../shared/services/products.service';
@@ -18,7 +18,7 @@ export const ProductDetailStore = signalStore(
       const existingProduct = globalProductsStore.products().find(x => x.id === productId);
 
       if (existingProduct) {
-        return { ...existingProduct, category: CATEGORY_NAME_MAP[existingProduct.category as ProductCategory] };
+        return existingProduct;
       }
 
       return null;

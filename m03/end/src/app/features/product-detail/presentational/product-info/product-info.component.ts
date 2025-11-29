@@ -1,7 +1,8 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, input, output } from '@angular/core';
-import { Product } from '../../../../shared/models/product.models';
+import { Component, computed, input, output } from '@angular/core';
+import { Product, ProductCategory } from '../../../../shared/models/product.models';
 import { AddToCartButtonComponent } from '../add-to-cart-button/add-to-cart-button.component';
+import { CATEGORY_NAME_MAP } from '../../../../shared/state/global-products.store';
 
 @Component({
   selector: 'app-product-info',
@@ -13,4 +14,6 @@ export class ProductInfoComponent {
   product = input.required<Product>();
 
   addToCartClicked = output<Product>();
+
+  productCategory = computed(() => CATEGORY_NAME_MAP[this.product().category as ProductCategory]);
 }
