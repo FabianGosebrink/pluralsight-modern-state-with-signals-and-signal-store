@@ -3,7 +3,7 @@
     <app-product-category
       (cartClicked)="onCartClicked($event)"
       (clicked)="onProductClicked($event)"
-      [categoryName]="productCategory.category | categoryName"
+      [categoryName]="productCategory.category"
       [products]="productCategory.products"
     />
   }

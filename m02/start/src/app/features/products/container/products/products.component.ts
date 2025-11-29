@@ -1,17 +1,16 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Product } from '../../../../shared/models/product.models';
-import { CategoryNamePipe } from '../../../../shared/pipes/category-name.pipe';
+import { CATEGORY_NAME_MAP, Product, ProductCategory } from '../../../../shared/models/product.models';
 import { CheckoutService } from '../../../../shared/services/checkout.service';
 import { ProductCategoryComponent } from '../../presentational/product-category/product-category.component';
 import { ProductsService } from '../../service/products.service';
 
 @Component({
   selector: 'app-products',
-  imports: [ProductCategoryComponent, CategoryNamePipe],
+  imports: [ProductCategoryComponent],
   templateUrl: './products.component.html',
-  styleUrl: './products.component.scss',
+  styleUrl: './products.component.scss'
 })
 export class ProductsComponent implements OnInit {
   products = signal<{ category: string; products: Product[] }[]>([]);
@@ -34,14 +33,14 @@ export class ProductsComponent implements OnInit {
 
           return result;
         },
-        {},
+        {}
       );
 
       const groupedByCategory = Object.keys(categoryProductMap).map(
         (category) => ({
-          category,
-          products: categoryProductMap[category],
-        }),
+          category: CATEGORY_NAME_MAP[category as ProductCategory],
+          products: categoryProductMap[category]
+        })
       );
 
       this.products.set(groupedByCategory);

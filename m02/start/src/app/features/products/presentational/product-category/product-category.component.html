@@ -3,9 +3,9 @@
   <div class="products">
     @for (product of products(); track product.id) {
       <app-product
+        (cartClicked)="cartClicked.emit($event)"
+        (clicked)="clicked.emit($event)"
         [product]="product"
-        (clicked)="onClicked($event)"
-        (cartClicked)="onCartClicked($event)"
       />
     }
   </div>
