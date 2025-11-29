@@ -46,9 +46,7 @@ export const ProductsStore = signalStore(
       getAll() {
         patchState(store, { products: PRODUCTS });
       },
-      addToCart(product: Product) {
-        globalCheckoutStore.addToCart(product);
-      },
+      addToCart: globalCheckoutStore.addToCart,
       onProductClicked(id: string): void {
         router.navigate(['products', id]);
       }

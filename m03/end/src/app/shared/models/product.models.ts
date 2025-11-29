@@ -7,3 +7,9 @@ export type Product = {
   category: ProductCategory;
   imageUrl: string;
 };
+
+export const CATEGORY_NAME_MAP: Record<ProductCategory, string> = {
+  ['book_fantasy']: 'Fantasy Books',
+  ['book_history']: 'History Books',
+  ['book_romance']: 'Romance Books'
+};

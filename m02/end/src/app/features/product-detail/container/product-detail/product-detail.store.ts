@@ -31,8 +31,6 @@ export const ProductDetailStore = signalStore(
 
       patchState(store, { product });
     },
-    addToCart(product: Product) {
-      globalCheckoutStore.addToCart(product);
-    }
+    addToCart: globalCheckoutStore.addToCart
   }))
 );

@@ -1,7 +1,7 @@
 import { signalStore, withComputed, withHooks, withMethods } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
-import { CATEGORY_NAME_MAP, GlobalProductsStore } from '../../../../shared/store/global-products.store';
-import { Product, ProductCategory } from '../../../../shared/models/product.models';
+import { GlobalProductsStore } from '../../../../shared/store/global-products.store';
+import { CATEGORY_NAME_MAP, Product, ProductCategory } from '../../../../shared/models/product.models';
 import { GlobalCheckoutStore } from '../../../../shared/store/global-checkout.store';
 import { Router } from '@angular/router';
 

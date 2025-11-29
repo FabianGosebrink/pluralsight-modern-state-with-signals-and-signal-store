@@ -12,13 +12,13 @@
         <strong>{{ product().name }}</strong>
       </div>
       <div class="category">
-        <i>{{ product().category }}</i>
+        <i>{{ productCategory() }}</i>
       </div>
     </div>
   </div>
   <div class="end-container">
     <div class="price">{{ product().price | currency: "CHF " }}</div>
-    <a (click)="onRemove()" class="icon">
+    <a (click)="removeClicked.emit()" class="icon">
       <svg
         height="100%"
         viewBox="0 0 100 100"

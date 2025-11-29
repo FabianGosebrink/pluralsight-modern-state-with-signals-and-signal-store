@@ -1,6 +1,6 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, input, output } from '@angular/core';
-import { Product } from '../../../../shared/models/product.models';
+import { Component, computed, input, output } from '@angular/core';
+import { CATEGORY_NAME_MAP, Product, ProductCategory } from '../../../../shared/models/product.models';
 import { AddToCartButtonComponent } from '../add-to-cart-button/add-to-cart-button.component';
 
 @Component({
@@ -13,4 +13,6 @@ export class ProductInfoComponent {
   product = input.required<Product>();
 
   addToCartClicked = output<Product>();
+
+  productCategory = computed(() => CATEGORY_NAME_MAP[this.product().category as ProductCategory]);
 }

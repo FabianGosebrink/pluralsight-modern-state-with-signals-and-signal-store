@@ -1,6 +1,6 @@
 import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
-import { Component, input, output } from '@angular/core';
-import { Product } from '../../../../shared/models/product.models';
+import { Component, computed, input, output } from '@angular/core';
+import { CATEGORY_NAME_MAP, Product, ProductCategory } from '../../../../shared/models/product.models';
 
 @Component({
   selector: 'app-product-list-entry',
@@ -13,7 +13,5 @@ export class ProductListEntryComponent {
 
   removeClicked = output();
 
-  onRemove(): void {
-    this.removeClicked.emit();
-  }
+  productCategory = computed(() => CATEGORY_NAME_MAP[this.product().category as ProductCategory]);
 }
