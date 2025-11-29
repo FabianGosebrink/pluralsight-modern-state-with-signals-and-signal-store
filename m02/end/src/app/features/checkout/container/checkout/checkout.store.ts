@@ -3,7 +3,6 @@ import { computed, inject } from '@angular/core';
 import { GlobalCheckoutStore } from '../../../../shared/store/global-checkout.store';
 import { Product } from '../../../../shared/models/product.models';
 
-
 export const CheckoutStore = signalStore(
   withComputed((_store, globalCheckoutStore = inject(GlobalCheckoutStore)) => {
     const cartProducts = computed(() => globalCheckoutStore.products() ?? [] as Product[]);

@@ -24,8 +24,7 @@ export const ProductDetailStore = signalStore(
       return null;
     })
   })),
-  withMethods((store,
-               globalCheckoutStore = inject(GlobalCheckoutStore)) => ({
+  withMethods((store, globalCheckoutStore = inject(GlobalCheckoutStore)) => ({
     loadProduct(id: string) {
       const product = PRODUCTS.find(p => p.id === id);
 
