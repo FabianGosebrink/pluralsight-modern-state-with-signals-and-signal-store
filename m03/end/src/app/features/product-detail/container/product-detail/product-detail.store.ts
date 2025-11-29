@@ -2,7 +2,6 @@ import { patchState, signalStore, withComputed, withMethods, withState } from '@
 import { computed, inject } from '@angular/core';
 import { GlobalProductsStore } from '../../../../shared/store/global-products.store';
 import { GlobalCheckoutStore } from '../../../../shared/store/global-checkout.store';
-import { Product } from '../../../../shared/models/product.models';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { exhaustMap, filter, pipe, tap } from 'rxjs';
 import { ProductsService } from '../../../../shared/services/products.service';
@@ -31,9 +30,7 @@ export const ProductDetailStore = signalStore(
       globalProductsStore = inject(GlobalProductsStore),
       productsService = inject(ProductsService)
     ) => ({
-      addToCart(product: Product) {
-        globalCheckoutStore.addToCart(product);
-      },
+      addToCart: globalCheckoutStore.addToCart,
       loadProductIfNotLoaded: rxMethod<string>(
         pipe(
           tap((productId) => patchState(store, { productId })),

@@ -17,9 +17,7 @@ export const CheckoutStore = signalStore(
       _store,
       globalCheckoutStore = inject(GlobalCheckoutStore)
     ) => ({
-      removeFromCart(index: number) {
-        globalCheckoutStore.removeFromCart(index);
-      }
+      removeFromCart: globalCheckoutStore.removeFromCart
     })
   )
 );
