@@ -1,7 +1,7 @@
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
-import { GlobalProductsStore } from '../../../../shared/state/global-products.store';
-import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.store';
+import { GlobalProductsStore } from '../../../../shared/store/global-products.store';
+import { GlobalCheckoutStore } from '../../../../shared/store/global-checkout.store';
 import { Product } from '../../../../shared/models/product.models';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { exhaustMap, filter, pipe, tap } from 'rxjs';
