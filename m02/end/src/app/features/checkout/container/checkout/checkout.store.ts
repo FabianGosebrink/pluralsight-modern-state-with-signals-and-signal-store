@@ -4,14 +4,10 @@ import { GlobalCheckoutStore } from '../../../../shared/store/global-checkout.st
 import { Product } from '../../../../shared/models/product.models';
 
 export const CheckoutStore = signalStore(
-  withComputed((_store, globalCheckoutStore = inject(GlobalCheckoutStore)) => {
-    const cartProducts = computed(() => globalCheckoutStore.products() ?? [] as Product[]);
-
-    return {
-      cartProducts,
-      totalAmount: computed(() => calculateTotalAmount(cartProducts()))
-    };
-  }),
+  withComputed((_store, globalCheckoutStore = inject(GlobalCheckoutStore)) => ({
+    cartProducts: globalCheckoutStore.products,
+    totalAmount: computed(() => calculateTotalAmount(globalCheckoutStore.products()))
+  })),
   withMethods(
     (
       _store, globalCheckoutStore = inject(GlobalCheckoutStore)
