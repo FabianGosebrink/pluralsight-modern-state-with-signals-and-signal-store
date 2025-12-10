@@ -4,8 +4,8 @@ import { GlobalProductsStore } from '../../../../shared/store/global-products.st
 import { GlobalCheckoutStore } from '../../../../shared/store/global-checkout.store';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { exhaustMap, filter, pipe, tap } from 'rxjs';
-import { ProductsService } from '../../../../shared/services/products.service';
 import { tapResponse } from '@ngrx/operators';
+import { ProductDetailService } from '../../service/product-detail.service';
 
 export const ProductDetailStore = signalStore(
   withState({
@@ -28,7 +28,7 @@ export const ProductDetailStore = signalStore(
       store,
       globalCheckoutStore = inject(GlobalCheckoutStore),
       globalProductsStore = inject(GlobalProductsStore),
-      productsService = inject(ProductsService)
+      productDetailService = inject(ProductDetailService)
     ) => ({
       addToCart: globalCheckoutStore.addToCart,
       loadProductIfNotLoaded: rxMethod<string>(
@@ -36,7 +36,7 @@ export const ProductDetailStore = signalStore(
           tap((productId) => patchState(store, { productId })),
           filter((productId) => !globalProductsStore.products().find(x => x.id === productId)),
           exhaustMap((id) =>
-            productsService.loadSingleProduct(id).pipe(
+            productDetailService.loadProductDetail(id).pipe(
               tapResponse({
                 next: (product) => globalProductsStore.add(product),
                 error: console.error
