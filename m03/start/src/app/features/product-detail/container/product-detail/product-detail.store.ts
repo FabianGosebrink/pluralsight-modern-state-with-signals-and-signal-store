@@ -1,31 +1,24 @@
-import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
-import { computed, inject } from '@angular/core';
-import { GlobalProductsStore } from '../../../../shared/state/global-products.store';
-import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.store';
-import { Product } from '../../../../shared/models/product.models';
+import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
+import { Product, PRODUCTS } from '../../../../shared/models/product.models';
+import { inject } from '@angular/core';
+import { GlobalCheckoutStore } from '../../../../shared/store/global-checkout.store';
+
+type ProductDetailState = {
+  product: Product | null;
+};
+
+const initialProductDetailState: ProductDetailState = {
+  product: null
+};
 
 export const ProductDetailStore = signalStore(
-  withState({
-    productId: null as string | null
-  }),
-  withComputed((store, globalProductsStore = inject(GlobalProductsStore)) => ({
-    product: computed(() => {
-      const productId = store.productId();
-      const product = globalProductsStore.products().find(x => x.id === productId);
+  withState<ProductDetailState>(initialProductDetailState),
+  withMethods((store, globalCheckoutStore = inject(GlobalCheckoutStore)) => ({
+    loadProduct(id: string) {
+      const product = PRODUCTS.find(p => p.id === id);
 
-      return product ?? null;
-    })
-  })),
-  withMethods(
-    (
-      store, globalCheckoutStore = inject(GlobalCheckoutStore)
-    ) => ({
-      loadProduct(productId: string) {
-        patchState(store, { productId });
-      },
-      addToCart(product: Product) {
-        globalCheckoutStore.addToCart(product);
-      }
-    })
-  )
+      patchState(store, { product });
+    },
+    addToCart: globalCheckoutStore.addToCart
+  }))
 );
