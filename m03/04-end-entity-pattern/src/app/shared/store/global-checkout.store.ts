@@ -1,37 +1,63 @@
-import { patchState, signalStore, withComputed, withHooks, withMethods } from '@ngrx/signals';
+import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
 import { Product } from '../models/product.models';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { exhaustMap } from 'rxjs';
+import { exhaustMap, filter, pipe } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
 import { CheckoutService } from '../services/checkout.service';
 import { computed, inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { setLoading, setLoadingFinished, withLoadingFeature } from './loading-feature';
-import { addEntities, addEntity, removeEntity, withEntities } from '@ngrx/signals/entities';
+import { withLoadingFeature } from './loading-feature';
+import { GlobalProductsStore } from './global-products.store';
+
+type CheckoutState = {
+  productIds: string[];
+};
+
+const initialCheckoutState: CheckoutState = {
+  productIds: []
+};
 
 export const GlobalCheckoutStore = signalStore(
   { providedIn: 'root' },
+  withState(initialCheckoutState),
   withLoadingFeature(),
-  withEntities<Product>(),
-  withComputed((store) => ({
-    products: computed(() => store.entities())
+  withComputed((store, globalProductsStore = inject(GlobalProductsStore)) => ({
+    products: computed(() => {
+      const byId = globalProductsStore.products()
+        .reduce<Record<string, Product>>((acc, p) => {
+          acc[p.id] = p;
+
+          return acc;
+        }, {});
+
+      return store
+        .productIds()
+        .map((id) => byId[id])
+        .filter((p): p is Product => !!p);
+    })
   })),
   withMethods(
     (
       store,
       checkoutService = inject(CheckoutService),
-      toastrService = inject(ToastrService)
+      toastrService = inject(ToastrService),
+      globalProductsStore = inject(GlobalProductsStore)
     ) => ({
-      loadAll: rxMethod<void>(
-        exhaustMap(() => {
-            patchState(store, setLoading());
-            return checkoutService.getCartProducts().pipe(
+      loadProductsIfNotLoaded: rxMethod<void>(
+        pipe(
+          filter(() => !globalProductsStore.products().length),
+          exhaustMap(() =>
+            checkoutService.getCartProducts().pipe(
               tapResponse({
-                next: (products) => patchState(store, addEntities(products), setLoadingFinished()),
+                next: (products) => {
+                  globalProductsStore.addMany(products);
+
+                  patchState(store, { productIds: products.map(x => x.id) });
+                },
                 error: console.error
               })
-            );
-          }
+            )
+          )
         )
       ),
 
@@ -41,7 +67,7 @@ export const GlobalCheckoutStore = signalStore(
             tapResponse({
                 next: () => {
                   toastrService.success('Item Added to Cart');
-                  patchState(store, addEntity(product));
+                  patchState(store, { productIds: [...store.productIds(), product.id] });
                 },
                 error: console.error
               }
@@ -54,10 +80,10 @@ export const GlobalCheckoutStore = signalStore(
           checkoutService.removeFromCart(index).pipe(
             tapResponse({
               next: () => {
-                const product = store.products()[index];
-
                 toastrService.success('Item removed from Cart');
-                patchState(store, removeEntity(product.id));
+                patchState(store, {
+                  productIds: store.productIds().filter((_, i) => i !== index)
+                });
               },
               error: console.error
             })
@@ -67,8 +93,8 @@ export const GlobalCheckoutStore = signalStore(
     })
   ),
   withHooks({
-    onInit({ loadAll }) {
-      loadAll();
+    onInit({ loadProductsIfNotLoaded }) {
+      loadProductsIfNotLoaded();
     }
   })
 );
