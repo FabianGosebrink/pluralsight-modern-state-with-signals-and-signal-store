@@ -15,8 +15,8 @@ export const ProductDetailStore = signalStore(
   }),
   withComputed((store, globalProductsStore = inject(GlobalProductsStore)) => ({
     productDetail: computed(() => {
-      const productId = store.productId();
-      const existingProduct = globalProductsStore.products().find(x => x.id === productId);
+      const productId = store.productId() ?? '';
+      const existingProduct = globalProductsStore.entityMap()[productId];
 
       return existingProduct ?? null;
     })
@@ -32,7 +32,7 @@ export const ProductDetailStore = signalStore(
       loadProductIfNotLoaded: rxMethod<string>(
         pipe(
           tap((productId) => patchState(store, { productId })),
-          filter((productId) => !globalProductsStore.products().find(x => x.id === productId)),
+          filter((productId) => !globalProductsStore.entityMap()[productId]),
           tap(() => patchState(store, setLoading())),
           exhaustMap((id) =>
             productDetailService.loadProductDetail(id).pipe(

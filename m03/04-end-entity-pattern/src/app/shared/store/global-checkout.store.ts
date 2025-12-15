@@ -23,16 +23,9 @@ export const GlobalCheckoutStore = signalStore(
   withLoadingFeature(),
   withComputed((store, globalProductsStore = inject(GlobalProductsStore)) => ({
     products: computed(() => {
-      const byId = globalProductsStore.products()
-        .reduce<Record<string, Product>>((acc, p) => {
-          acc[p.id] = p;
-
-          return acc;
-        }, {});
-
       return store
         .productIds()
-        .map((id) => byId[id])
+        .map((id) => globalProductsStore.entityMap()[id])
         .filter((p): p is Product => !!p);
     })
   })),
@@ -45,7 +38,7 @@ export const GlobalCheckoutStore = signalStore(
     ) => ({
       loadProductsIfNotLoaded: rxMethod<void>(
         pipe(
-          filter(() => !globalProductsStore.products().length),
+          filter(() => !globalProductsStore.entities().length),
           exhaustMap(() =>
             checkoutService.getCartProducts().pipe(
               tapResponse({

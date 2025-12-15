@@ -11,7 +11,7 @@ export const ProductsStore = signalStore(
   }),
   withComputed((_store, globalProductsStore = inject(GlobalProductsStore)) => ({
     productsByCategories: computed(() => {
-      const products = globalProductsStore.products();
+      const products = globalProductsStore.entities();
       const productsByCategory = products.reduce(
         (result: Record<string, Product[]>, product: Product) => {
           const { category } = product;
