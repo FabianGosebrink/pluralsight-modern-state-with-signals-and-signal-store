@@ -6,8 +6,10 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { exhaustMap, filter, pipe, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
 import { ProductDetailService } from '../../service/product-detail.service';
+import { setLoading, setLoadingFinished, withLoadingFeature } from '../../../../shared/store/loading-feature';
 
 export const ProductDetailStore = signalStore(
+  withLoadingFeature(),
   withState({
     productId: null as string | null
   }),
@@ -16,11 +18,7 @@ export const ProductDetailStore = signalStore(
       const productId = store.productId();
       const existingProduct = globalProductsStore.products().find(x => x.id === productId);
 
-      if (existingProduct) {
-        return existingProduct;
-      }
-
-      return null;
+      return existingProduct ?? null;
     })
   })),
   withMethods(
@@ -35,10 +33,15 @@ export const ProductDetailStore = signalStore(
         pipe(
           tap((productId) => patchState(store, { productId })),
           filter((productId) => !globalProductsStore.products().find(x => x.id === productId)),
+          tap(() => patchState(store, setLoading())),
           exhaustMap((id) =>
             productDetailService.loadProductDetail(id).pipe(
               tapResponse({
-                next: (product) => globalProductsStore.add(product),
+                next: (product) => {
+                  patchState(store, setLoadingFinished());
+
+                  globalProductsStore.add(product);
+                },
                 error: console.error
               })
             )

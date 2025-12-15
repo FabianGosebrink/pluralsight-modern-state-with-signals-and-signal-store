@@ -1,11 +1,15 @@
-<div class="products-list">
-  @for (productCategory of store.productsByCategories(); track productCategory.category) {
-    <app-product-category
-      (cartClicked)="store.addToCart($event)"
-      (clicked)="store.onProductClicked($event)"
-      [categoryName]="productCategory.category"
-      [products]="productCategory.products"
-    />
-  }
+@if (store.loading()) {
+  Loading...
+} @else {
+  <div class="products-list">
+    @for (productCategory of store.productsByCategories(); track productCategory.category) {
+      <app-product-category
+        (cartClicked)="store.addToCart($event)"
+        (clicked)="store.onProductClicked($event)"
+        [categoryName]="productCategory.category"
+        [products]="productCategory.products"
+      />
+    }
+  </div>
+}
 
-</div>

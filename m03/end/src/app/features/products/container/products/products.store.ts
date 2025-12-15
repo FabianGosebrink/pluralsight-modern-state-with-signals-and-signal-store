@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 
 export const ProductsStore = signalStore(
   withComputed((_store, globalProductsStore = inject(GlobalProductsStore)) => ({
+    loading: globalProductsStore.loading,
     productsByCategories: computed(() => {
       const products = globalProductsStore.products();
       const productsByCategory = products.reduce(
