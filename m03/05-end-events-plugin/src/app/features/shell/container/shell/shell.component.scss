@@ -1,0 +1,19 @@
+@use "colors";
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background-color: colors.$primary-background-color;
+}
+
+.header {
+  height: 50px;
+}
+
+.content {
+  flex: 1;
+  overflow: auto;
+  padding: 20px 40px;
+}
