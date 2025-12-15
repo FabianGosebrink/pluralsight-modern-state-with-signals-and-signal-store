@@ -1,6 +1,6 @@
 <div class="products-list">
 
-  <input [formControl]="search" />
+  <app-search (searchChanged)="store.searchValueChanged($event)" />
 
   @for (productCategory of store.productsByCategories(); track productCategory.category) {
     <app-product-category
