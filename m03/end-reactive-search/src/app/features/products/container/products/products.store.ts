@@ -4,6 +4,8 @@ import { GlobalProductsStore } from '../../../../shared/store/global-products.st
 import { CATEGORY_NAME_MAP, Product, ProductCategory } from '../../../../shared/models/product.models';
 import { GlobalCheckoutStore } from '../../../../shared/store/global-checkout.store';
 import { Router } from '@angular/router';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { tap } from 'rxjs';
 
 export const ProductsStore = signalStore(
   withState({
@@ -48,9 +50,11 @@ export const ProductsStore = signalStore(
       onProductClicked(id: string): void {
         router.navigate(['products', id]);
       },
-      setSearchTerm(term: string) {
-        patchState(store, { searchTerm: term });
-      }
+      valueChanged: rxMethod<string>(
+        tap((searchTerm) =>
+          patchState(store, { searchTerm })
+        )
+      )
     })
   ),
   withHooks({
