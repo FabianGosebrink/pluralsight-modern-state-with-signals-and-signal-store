@@ -1,21 +1,15 @@
 import { patchState, signalMethod, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
-import { GlobalProductsStore } from '../../../../shared/state/global-products.store';
-import { Product, ProductCategory } from '../../../../shared/models/product.models';
-import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.store';
+import { GlobalProductsStore } from '../../../../shared/store/global-products.store';
+import { CATEGORY_NAME_MAP, Product, ProductCategory } from '../../../../shared/models/product.models';
+import { GlobalCheckoutStore } from '../../../../shared/store/global-checkout.store';
 import { Router } from '@angular/router';
-
-const CATEGORY_NAME_MAP: Record<ProductCategory, string> = {
-  ['book_fantasy']: 'Fantasy Books',
-  ['book_history']: 'History Books',
-  ['book_romance']: 'Romance Books'
-};
 
 export const ProductsStore = signalStore(
   withState({
     searchTerm: ''
   }),
-  withComputed((store, globalProductsStore = inject(GlobalProductsStore)) => ({
+  withComputed((_store, globalProductsStore = inject(GlobalProductsStore)) => ({
     productsByCategories: computed(() => {
       const products = globalProductsStore.products();
       const productsByCategory = products.reduce(

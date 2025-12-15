@@ -6,6 +6,7 @@ import { tapResponse } from '@ngrx/operators';
 import { CheckoutService } from '../services/checkout.service';
 import { inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { setLoading, setLoadingFinished, withLoadingFeature } from './loading-feature';
 
 type CheckoutState = {
   products: Product[];
@@ -18,6 +19,7 @@ const initialCheckoutState: CheckoutState = {
 export const GlobalCheckoutStore = signalStore(
   { providedIn: 'root' },
   withState(initialCheckoutState),
+  withLoadingFeature(),
   withMethods(
     (
       store,
@@ -25,13 +27,15 @@ export const GlobalCheckoutStore = signalStore(
       toastrService = inject(ToastrService)
     ) => ({
       loadAll: rxMethod<void>(
-        exhaustMap(() =>
-          checkoutService.getCartProducts().pipe(
-            tapResponse({
-              next: (products) => patchState(store, { products }),
-              error: console.error
-            })
-          )
+        exhaustMap(() => {
+            patchState(store, setLoading());
+            return checkoutService.getCartProducts().pipe(
+              tapResponse({
+                next: (products) => patchState(store, { products }, setLoadingFinished()),
+                error: console.error
+              })
+            );
+          }
         )
       ),
 

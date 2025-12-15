@@ -11,11 +11,7 @@ export class ProductsService {
 
   loadProducts(query: string = ''): Observable<Product[]> {
     const options = query ? { params: { query } } : {};
-    
-    return this.http.get<Product[]>('http://localhost:3000/products', options);
-  }
 
-  loadSingleProduct(id: string): Observable<Product> {
-    return this.http.get<Product>('http://localhost:3000/products/' + id);
+    return this.http.get<Product[]>('http://localhost:3000/products', options);
   }
 }

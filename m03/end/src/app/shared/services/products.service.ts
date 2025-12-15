@@ -12,8 +12,4 @@ export class ProductsService {
   loadProducts(): Observable<Product[]> {
     return this.http.get<Product[]>('http://localhost:3000/products');
   }
-
-  loadSingleProduct(id: string): Observable<Product> {
-    return this.http.get<Product>('http://localhost:3000/products/' + id);
-  }
 }

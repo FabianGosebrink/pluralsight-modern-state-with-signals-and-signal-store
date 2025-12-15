@@ -1,26 +1,24 @@
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
-import { GlobalProductsStore } from '../../../../shared/state/global-products.store';
-import { GlobalCheckoutStore } from '../../../../shared/state/global-checkout.store';
-import { Product } from '../../../../shared/models/product.models';
+import { GlobalProductsStore } from '../../../../shared/store/global-products.store';
+import { GlobalCheckoutStore } from '../../../../shared/store/global-checkout.store';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { exhaustMap, filter, pipe, tap } from 'rxjs';
-import { ProductsService } from '../../../../shared/services/products.service';
 import { tapResponse } from '@ngrx/operators';
+import { ProductDetailService } from '../../service/product-detail.service';
+import { setLoading, setLoadingFinished, withLoadingFeature } from '../../../../shared/store/loading-feature';
 
 export const ProductDetailStore = signalStore(
+  withLoadingFeature(),
   withState({
-    _product: null as Product | null,
     productId: null as string | null
   }),
   withComputed((store, globalProductsStore = inject(GlobalProductsStore)) => ({
     productDetail: computed(() => {
       const productId = store.productId();
-      const product = store._product();
-
       const existingProduct = globalProductsStore.products().find(x => x.id === productId);
 
-      return existingProduct ?? product;
+      return existingProduct ?? null;
     })
   })),
   withMethods(
@@ -28,19 +26,22 @@ export const ProductDetailStore = signalStore(
       store,
       globalCheckoutStore = inject(GlobalCheckoutStore),
       globalProductsStore = inject(GlobalProductsStore),
-      productsService = inject(ProductsService)
+      productDetailService = inject(ProductDetailService)
     ) => ({
-      addToCart(product: Product) {
-        globalCheckoutStore.addToCart(product);
-      },
+      addToCart: globalCheckoutStore.addToCart,
       loadProductIfNotLoaded: rxMethod<string>(
         pipe(
           tap((productId) => patchState(store, { productId })),
           filter((productId) => !globalProductsStore.products().find(x => x.id === productId)),
+          tap(() => patchState(store, setLoading())),
           exhaustMap((id) =>
-            productsService.loadSingleProduct(id).pipe(
+            productDetailService.loadProductDetail(id).pipe(
               tapResponse({
-                next: (product) => patchState(store, { _product: product }),
+                next: (product) => {
+                  patchState(store, setLoadingFinished());
+
+                  globalProductsStore.add(product);
+                },
                 error: console.error
               })
             )

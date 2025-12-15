@@ -5,6 +5,7 @@ import { debounceTime, distinctUntilChanged, exhaustMap, pipe } from 'rxjs';
 import { ProductsService } from '../services/products.service';
 import { inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
+import { setLoading, setLoadingFinished, withLoadingFeature } from './loading-feature';
 
 type ProductsState = {
   products: Product[];
@@ -17,8 +18,23 @@ const initialProductsState: ProductsState = {
 export const GlobalProductsStore = signalStore(
   { providedIn: 'root' },
   withState(initialProductsState),
+  withLoadingFeature(),
   withMethods(
     (store, productsService = inject(ProductsService)) => ({
+      getAll: rxMethod<void>(
+        exhaustMap(() => {
+            patchState(store, setLoading());
+
+            return productsService.loadProducts().pipe(
+              tapResponse({
+                next: (products) =>
+                  patchState(store, { products }, setLoadingFinished()),
+                error: console.error
+              })
+            );
+          }
+        )
+      ),
       loadByQuery: rxMethod<string>(
         pipe(
           debounceTime(300),
@@ -30,7 +46,10 @@ export const GlobalProductsStore = signalStore(
             })
           ))
         )
-      )
+      ),
+      add(product: Product) {
+        patchState(store, { products: [...store.products(), product] });
+      }
     })
   )
 );

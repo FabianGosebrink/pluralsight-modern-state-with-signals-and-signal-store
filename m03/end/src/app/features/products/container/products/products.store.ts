@@ -5,7 +5,6 @@ import { CATEGORY_NAME_MAP, Product, ProductCategory } from '../../../../shared/
 import { GlobalCheckoutStore } from '../../../../shared/store/global-checkout.store';
 import { Router } from '@angular/router';
 
-
 export const ProductsStore = signalStore(
   withComputed((_store, globalProductsStore = inject(GlobalProductsStore)) => ({
     loading: globalProductsStore.loading,
