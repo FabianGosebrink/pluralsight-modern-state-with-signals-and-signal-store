@@ -1,0 +1,23 @@
+@use "colors";
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+.back-link {
+  color: colors.$secondary-color;
+  text-decoration: none;
+  width: fit-content;
+
+  &:hover {
+    color: colors.$primary-color;
+    cursor: pointer;
+  }
+}
+
+.detail-container {
+  display: flex;
+  gap: 40px;
+}
