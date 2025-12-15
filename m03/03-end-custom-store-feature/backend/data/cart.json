@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "id": "5",
+    "name": "Empire of Storms",
+    "category": "book_fantasy",
+    "price": 29.9,
+    "imageUrl": "https://ia800505.us.archive.org/view_archive.php?archive=/35/items/l_covers_0014/l_covers_0014_34.zip&file=0014349146-L.jpg"
+  }
+]
