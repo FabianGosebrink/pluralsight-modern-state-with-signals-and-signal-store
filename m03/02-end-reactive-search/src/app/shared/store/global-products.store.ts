@@ -44,6 +44,9 @@ export const GlobalProductsStore = signalStore(
       ),
       add(product: Product) {
         patchState(store, { products: [...store.products(), product] });
+      },
+      addMany(products: Product[]) {
+        patchState(store, { products });
       }
     })
   )
