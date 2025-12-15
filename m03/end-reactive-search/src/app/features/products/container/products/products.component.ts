@@ -15,7 +15,7 @@ export class ProductsComponent {
   search = new FormControl('', { nonNullable: true });
 
   constructor() {
-    this.store.valueChanged(this.search.valueChanges);
+    this.store.searchValueChanged(this.search.valueChanges);
 
     const query = this.store.searchTerm;
     this.store.loadByQuery(query);

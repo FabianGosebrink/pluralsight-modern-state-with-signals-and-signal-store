@@ -1,7 +1,7 @@
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { Product } from '../models/product.models';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { debounceTime, distinctUntilChanged, exhaustMap, pipe } from 'rxjs';
+import { debounceTime, distinctUntilChanged, exhaustMap, filter, pipe } from 'rxjs';
 import { ProductsService } from '../services/products.service';
 import { inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
@@ -39,6 +39,7 @@ export const GlobalProductsStore = signalStore(
         pipe(
           debounceTime(300),
           distinctUntilChanged(),
+          filter((query) => query.length > 2 || !query),
           exhaustMap((query) => productsService.loadProducts(query).pipe(
             tapResponse({
               next: (products) => patchState(store, { products }),

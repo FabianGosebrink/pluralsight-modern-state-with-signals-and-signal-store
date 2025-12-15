@@ -50,7 +50,7 @@ export const ProductsStore = signalStore(
       onProductClicked(id: string): void {
         router.navigate(['products', id]);
       },
-      valueChanged: rxMethod<string>(
+      searchValueChanged: rxMethod<string>(
         tap((searchTerm) =>
           patchState(store, { searchTerm })
         )
