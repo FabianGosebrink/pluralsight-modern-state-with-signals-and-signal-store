@@ -1,24 +1,23 @@
 import { computed } from '@angular/core';
 import { signalStoreFeature, withComputed, withState } from '@ngrx/signals';
 
-export type LoadingState = { loading: boolean };
+export type LoadingStatus = 'running' | 'finished' | 'not_started';
+export type LoadingState = { loadingStatus: LoadingStatus };
 
 export function withLoadingFeature() {
   return signalStoreFeature(
-    withState<LoadingState>({ loading: false }),
-    withComputed(({ loading }) => ({
-      isPending: computed(() => loading()),
-      isFulfilled: computed(() => !loading())
-    }))
+    withState<LoadingState>({ loadingStatus: 'not_started' }),
+    withComputed(({ loadingStatus }) => ({
+      loading: computed(() => loadingStatus() === 'running'),
+      isFinished: computed(() => loadingStatus() === 'finished'),
+    })),
   );
 }
 
 export function setLoading(): LoadingState {
-  return { loading: true };
+  return { loadingStatus: 'running' };
 }
 
-export function setLoadingFinished() {
-  return { loading: false };
+export function setLoadingFinished(): LoadingState {
+  return { loadingStatus: 'finished' };
 }
-
-
