@@ -1,6 +1,6 @@
-import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import express from 'express';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -46,8 +46,18 @@ const asyncHandler =
 app.get(
   '/products',
   asyncHandler(async (req, res) => {
+    const { query } = req.query;
     const products = await readJSON<Product[]>('products.json');
-    res.json(products);
+
+    if (!query || typeof query !== 'string') {
+      res.json(products);
+      return;
+    }
+
+    const filteredProducts = products.filter((p) =>
+      p.name.toLowerCase().includes(query.toLowerCase()),
+    );
+    res.json(filteredProducts);
   }),
 );
 
