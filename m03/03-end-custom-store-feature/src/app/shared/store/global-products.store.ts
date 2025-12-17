@@ -40,14 +40,17 @@ export const GlobalProductsStore = signalStore(
     loadByQuery: rxMethod<string>(
       pipe(
         filter((query) => query.length > 2 || !query),
-        exhaustMap((query) =>
-          productsService.loadProducts(query).pipe(
+        exhaustMap((query) => {
+          patchState(store, setLoading());
+
+          return productsService.loadProducts(query).pipe(
             tapResponse({
-              next: (products) => patchState(store, { products }),
+              next: (products) =>
+                patchState(store, { products }, setLoadingFinished()),
               error: console.error,
             }),
-          ),
-        ),
+          );
+        }),
       ),
     ),
     add(product: Product) {
