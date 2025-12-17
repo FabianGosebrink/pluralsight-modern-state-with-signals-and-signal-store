@@ -1,7 +1,12 @@
 import { inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
 import { patchState, signalStore, withMethods } from '@ngrx/signals';
-import { addEntities, addEntity, withEntities } from '@ngrx/signals/entities';
+import {
+  addEntities,
+  addEntity,
+  setAllEntities,
+  withEntities,
+} from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { exhaustMap, filter, pipe } from 'rxjs';
 import { Product } from '../models/product.models';
@@ -17,30 +22,24 @@ export const GlobalProductsStore = signalStore(
   withEntities<Product>(),
   withLoadingFeature(),
   withMethods((store, productsService = inject(ProductsService)) => ({
-    getAll: rxMethod<void>(
-      exhaustMap(() => {
-        patchState(store, setLoading());
-
-        return productsService.loadProducts().pipe(
-          tapResponse({
-            next: (products) =>
-              patchState(store, addEntities(products), setLoadingFinished()),
-            error: console.error,
-          }),
-        );
-      }),
-    ),
     loadByQuery: rxMethod<string>(
       pipe(
         filter((query) => query.length > 2 || !query),
-        exhaustMap((query) =>
-          productsService.loadProducts(query).pipe(
+        exhaustMap((query) => {
+          patchState(store, setLoading());
+
+          return productsService.loadProducts(query).pipe(
             tapResponse({
-              next: (products) => patchState(store, addEntities(products)),
+              next: (products) =>
+                patchState(
+                  store,
+                  setAllEntities(products),
+                  setLoadingFinished(),
+                ),
               error: console.error,
             }),
-          ),
-        ),
+          );
+        }),
       ),
     ),
     add(product: Product) {

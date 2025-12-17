@@ -24,19 +24,6 @@ export const GlobalProductsStore = signalStore(
   withState(initialProductsState),
   withLoadingFeature(),
   withMethods((store, productsService = inject(ProductsService)) => ({
-    getAll: rxMethod<void>(
-      exhaustMap(() => {
-        patchState(store, setLoading());
-
-        return productsService.loadProducts().pipe(
-          tapResponse({
-            next: (products) =>
-              patchState(store, { products }, setLoadingFinished()),
-            error: console.error,
-          }),
-        );
-      }),
-    ),
     loadByQuery: rxMethod<string>(
       pipe(
         filter((query) => query.length > 2 || !query),
