@@ -7,7 +7,7 @@
     <app-product-image [imageUrl]="product.imageUrl" />
 
     <app-product-info
-      (addToCartClicked)="store.addToCart($event)"
+      (addToCartClicked)="dispatch.addToCartClicked($event)"
       [product]="product"
     />
   </div>
