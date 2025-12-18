@@ -13,6 +13,7 @@ describe('ProductImageComponent', () => {
 
     fixture = TestBed.createComponent(ProductImageComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('imageUrl', "test.jpg");
     fixture.detectChanges();
   });
 
