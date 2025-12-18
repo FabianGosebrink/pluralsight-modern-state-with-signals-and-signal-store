@@ -31,8 +31,8 @@ export const productDetailApiEvents = eventGroup({
   source: 'Product Detail API',
   events: {
     loadProduct: type<string>(),
-    productLoadedSuccess: type<Product>(),
-    productLoadedFailure: type<unknown>(),
+    loadProductSuccess: type<Product>(),
+    loadProductFailure: type<unknown>(),
   },
 });
 
@@ -51,8 +51,8 @@ export const ProductDetailStore = signalStore(
     on(productDetailApiEvents.loadProduct, () => setLoading()),
 
     on(
-      productDetailApiEvents.productLoadedSuccess,
-      productDetailApiEvents.productLoadedFailure,
+      productDetailApiEvents.loadProductSuccess,
+      productDetailApiEvents.loadProductFailure,
       () => setLoadingFinished(),
     ),
   ),
@@ -60,8 +60,8 @@ export const ProductDetailStore = signalStore(
   withComputed((store, globalProductsStore = inject(GlobalProductsStore)) => ({
     productDetail: computed(() => {
       const productId = store.productId() ?? '';
-      console.log('productDetail', productId);
       const existingProduct = globalProductsStore.entityMap()[productId];
+
       return existingProduct ?? null;
     }),
   })),
@@ -86,30 +86,24 @@ export const ProductDetailStore = signalStore(
           productDetailService.loadProductDetail(payload).pipe(
             mapResponse({
               next: (product) =>
-                productDetailApiEvents.productLoadedSuccess(product),
+                productDetailApiEvents.loadProductSuccess(product),
               error: (error: unknown) =>
-                productDetailApiEvents.productLoadedFailure(error),
+                productDetailApiEvents.loadProductFailure(error),
             }),
           ),
         ),
       ),
 
       addToGlobalStore$: events
-        .on(productDetailApiEvents.productLoadedSuccess)
-        .pipe(
-          tap(({ payload }) => {
-            globalProductsStore.add(payload);
-          }),
-        ),
+        .on(productDetailApiEvents.loadProductSuccess)
+        .pipe(tap(({ payload }) => globalProductsStore.add(payload))),
 
-      addToCart$: events.on(productDetailPageEvents.addToCartClicked).pipe(
-        tap(({ payload }) => {
-          globalCheckoutStore.addToCart(payload);
-        }),
-      ),
+      addToCart$: events
+        .on(productDetailPageEvents.addToCartClicked)
+        .pipe(tap(({ payload }) => globalCheckoutStore.addToCart(payload))),
 
       logErrors$: events
-        .on(productDetailApiEvents.productLoadedFailure)
+        .on(productDetailApiEvents.loadProductFailure)
         .pipe(
           tap(({ payload }) =>
             console.error(`Failed to load product`, payload),
