@@ -1,13 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  patchState,
-  signalStore,
-  withComputed,
-  withHooks,
-  withMethods,
-  withState,
-} from '@ngrx/signals';
+import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import {
   CATEGORY_NAME_MAP,
   Product,
@@ -33,7 +26,7 @@ export const ProductsStore = signalStore(
 
           return result;
         },
-        {},
+        {}
       );
 
       const categories = Object.keys(productsByCategory);
@@ -49,7 +42,7 @@ export const ProductsStore = signalStore(
       store,
       globalCheckoutStore = inject(GlobalCheckoutStore),
       globalProductsStore = inject(GlobalProductsStore),
-      router = inject(Router),
+      router = inject(Router)
     ) => ({
       addToCart: globalCheckoutStore.addToCart,
       loadByQuery: globalProductsStore.loadByQuery,
@@ -59,11 +52,6 @@ export const ProductsStore = signalStore(
       searchValueChanged(searchTerm: string) {
         patchState(store, { searchTerm });
       },
-    }),
-  ),
-  withHooks({
-    onInit(store, globalProductsStore = inject(GlobalProductsStore)) {
-      globalProductsStore.loadByQuery(store.searchTerm());
-    },
-  }),
+    })
+  )
 );

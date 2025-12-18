@@ -1,0 +1,20 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`GlobalProductsStore > should update entity computed properties when adding products 1`] = `
+{
+  "1": {
+    "category": "book_fantasy",
+    "id": "1",
+    "imageUrl": "1.jpg",
+    "name": "P1",
+    "price": 10,
+  },
+  "2": {
+    "category": "book_history",
+    "id": "2",
+    "imageUrl": "2.jpg",
+    "name": "P2",
+    "price": 20,
+  },
+}
+`;

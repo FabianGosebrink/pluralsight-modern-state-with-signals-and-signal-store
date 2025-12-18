@@ -4,7 +4,6 @@ import {
   patchState,
   signalStore,
   withComputed,
-  withHooks,
   withMethods,
   withState,
 } from '@ngrx/signals';
@@ -61,9 +60,4 @@ export const ProductsStore = signalStore(
       },
     }),
   ),
-  withHooks({
-    onInit(store, globalProductsStore = inject(GlobalProductsStore)) {
-      globalProductsStore.loadByQuery(store.searchTerm());
-    },
-  }),
 );
