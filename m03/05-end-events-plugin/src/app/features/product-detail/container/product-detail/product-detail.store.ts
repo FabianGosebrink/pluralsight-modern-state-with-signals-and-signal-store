@@ -2,7 +2,7 @@ import { signalStore, type, withComputed, withState } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
 import { GlobalProductsStore } from '../../../../shared/store/global-products.store';
 import { GlobalCheckoutStore } from '../../../../shared/store/global-checkout.store';
-import { exhaustMap, filter, map, tap } from 'rxjs';
+import { exhaustMap, filter, tap } from 'rxjs';
 import {
   eventGroup,
   Events,
@@ -30,9 +30,9 @@ export const productDetailPageEvents = eventGroup({
 export const productDetailApiEvents = eventGroup({
   source: 'Product Detail API',
   events: {
-    loadProduct: type<string>(),
-    loadProductSuccess: type<Product>(),
-    loadProductFailure: type<unknown>(),
+    productLoadStarted: type<string>(),
+    productLoadedSuccess: type<Product>(),
+    productLoadedFailure: type<unknown>(),
   },
 });
 
@@ -44,15 +44,15 @@ export const ProductDetailStore = signalStore(
   withLoadingFeature(),
 
   withReducer(
-    on(productDetailPageEvents.opened, ({ payload }) => [
-      { productId: payload },
-    ]),
+    on(productDetailPageEvents.opened, ({ payload: productId }) => ({
+      productId,
+    })),
 
-    on(productDetailApiEvents.loadProduct, () => setLoading()),
+    on(productDetailApiEvents.productLoadStarted, () => setLoading()),
 
     on(
-      productDetailApiEvents.loadProductSuccess,
-      productDetailApiEvents.loadProductFailure,
+      productDetailApiEvents.productLoadedSuccess,
+      productDetailApiEvents.productLoadedFailure,
       () => setLoadingFinished(),
     ),
   ),
@@ -74,28 +74,25 @@ export const ProductDetailStore = signalStore(
       globalProductsStore = inject(GlobalProductsStore),
       productDetailService = inject(ProductDetailService),
     ) => ({
-      loadProductIfNotAlreadyPresent$: events
-        .on(productDetailPageEvents.opened)
-        .pipe(
-          filter(({ payload }) => !globalProductsStore.entityMap()[payload]),
-          map(({ payload }) => productDetailApiEvents.loadProduct(payload)),
+      loadProduct$: events.on(productDetailPageEvents.opened).pipe(
+        filter(({ payload }) => !globalProductsStore.entityMap()[payload]),
+        tap(({ payload }) =>
+          productDetailApiEvents.productLoadStarted(payload),
         ),
-
-      loadProduct$: events.on(productDetailApiEvents.loadProduct).pipe(
         exhaustMap(({ payload }) =>
           productDetailService.loadProductDetail(payload).pipe(
             mapResponse({
               next: (product) =>
-                productDetailApiEvents.loadProductSuccess(product),
+                productDetailApiEvents.productLoadedSuccess(product),
               error: (error: unknown) =>
-                productDetailApiEvents.loadProductFailure(error),
+                productDetailApiEvents.productLoadedFailure(error),
             }),
           ),
         ),
       ),
 
       addToGlobalStore$: events
-        .on(productDetailApiEvents.loadProductSuccess)
+        .on(productDetailApiEvents.productLoadedSuccess)
         .pipe(tap(({ payload }) => globalProductsStore.add(payload))),
 
       addToCart$: events
@@ -103,7 +100,7 @@ export const ProductDetailStore = signalStore(
         .pipe(tap(({ payload }) => globalCheckoutStore.addToCart(payload))),
 
       logErrors$: events
-        .on(productDetailApiEvents.loadProductFailure)
+        .on(productDetailApiEvents.productLoadedFailure)
         .pipe(
           tap(({ payload }) =>
             console.error(`Failed to load product`, payload),
