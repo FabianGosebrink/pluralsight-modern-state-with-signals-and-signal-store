@@ -1,0 +1,13 @@
+<div class="products-list">
+  <app-search (searchChanged)="searchValueChanged($event)" />
+
+  @for (productCategory of productsByCategories();
+    track productCategory.category) {
+    <app-product-category
+      (cartClicked)="addToCart($event)"
+      (clicked)="onProductClicked($event)"
+      [categoryName]="productCategory.category"
+      [products]="productCategory.products"
+    />
+  }
+</div>

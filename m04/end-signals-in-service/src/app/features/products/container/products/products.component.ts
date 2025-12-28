@@ -1,0 +1,44 @@
+import { Component, computed, inject, OnInit } from '@angular/core';
+import { ProductCategoryComponent } from '../../presentational/product-category/product-category.component';
+import { SearchComponent } from '../../presentational/search/search.component';
+import { Product } from '../../../../shared/products/models/product.models';
+import { ProductsService } from '../../../../shared/products/services/products.service';
+import { CheckoutService } from '../../../../shared/checkout/services/checkout.service';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-products',
+  imports: [ProductCategoryComponent, SearchComponent],
+  templateUrl: './products.component.html',
+  styleUrl: './products.component.scss'
+})
+export class ProductsComponent implements OnInit {
+  private readonly productsService = inject(ProductsService);
+  readonly productsByCategories = computed(() => {
+    const products = this.productsService.products();
+    const categories = [...new Set(products.map((p) => p.category))];
+
+    return categories.map((category) => ({
+      category,
+      products: products.filter((p) => p.category === category)
+    }));
+  });
+  private readonly checkoutService = inject(CheckoutService);
+  private readonly router = inject(Router);
+
+  ngOnInit(): void {
+    this.productsService.loadProducts().subscribe();
+  }
+
+  onProductClicked(id: string): void {
+    this.router.navigate(['/products', id]);
+  }
+
+  addToCart(product: Product): void {
+    this.checkoutService.addToCart(product).subscribe();
+  }
+
+  searchValueChanged(searchTerm: string): void {
+    this.productsService.loadProducts(searchTerm).subscribe();
+  }
+}
