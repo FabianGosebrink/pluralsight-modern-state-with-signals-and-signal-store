@@ -9,16 +9,19 @@ import { ProductsService } from '../services/products.service';
 export const loadProducts$ = createEffect(
   (actions$ = inject(Actions), productsService = inject(ProductsService)) =>
     actions$.pipe(
-      ofType(ProductsUserActions.loadProducts),
-      exhaustMap(() =>
-        productsService.loadProducts().pipe(
-          map((products) =>
-            ProductsApiActions.loadProductsSuccess({ products })
-          ),
-          catchError((error: HttpErrorResponse) =>
-            of(ProductsApiActions.loadProductsFailure({ error }))
-          )
-        )
+      ofType(ProductsUserActions.loadProducts, ProductsUserActions.searchProduct),
+      exhaustMap((action) => {
+          const searchTerm = 'searchTerm' in action ? action.searchTerm : '';
+
+          return productsService.loadProducts(searchTerm).pipe(
+            map((products) =>
+              ProductsApiActions.loadProductsSuccess({ products })
+            ),
+            catchError((error: HttpErrorResponse) =>
+              of(ProductsApiActions.loadProductsFailure({ error }))
+            )
+          );
+        }
       )
     ),
   { functional: true }

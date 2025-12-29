@@ -34,6 +34,6 @@ export class ProductsComponent implements OnInit {
   }
 
   searchValueChanged(searchTerm: string): void {
-
+    this.store.dispatch(ProductsUserActions.searchProduct({ searchTerm }));
   }
 }

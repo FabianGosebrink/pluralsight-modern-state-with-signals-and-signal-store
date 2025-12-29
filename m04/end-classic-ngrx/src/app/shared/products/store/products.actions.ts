@@ -16,6 +16,7 @@ export const ProductsUserActions = createActionGroup({
   source: 'Products User',
   events: {
     'Load Products': emptyProps(),
-    'Navigate To Detail': props<{ id: string }>()
+    'Navigate To Detail': props<{ id: string }>(),
+    'Search Product': props<{ searchTerm: string }>()
   }
 });
