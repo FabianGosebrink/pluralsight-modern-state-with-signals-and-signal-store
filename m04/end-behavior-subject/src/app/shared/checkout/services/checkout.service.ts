@@ -1,11 +1,11 @@
-import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest, map, Observable, tap } from 'rxjs';
-import { ProductsService } from '../../products/services/products.service';
 import { Product } from '../../products/models/product.models';
+import { ProductsService } from '../../products/services/products.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CheckoutService {
   readonly #baseUrl = 'http://localhost:3000/cart/';
@@ -16,21 +16,23 @@ export class CheckoutService {
 
   readonly cartProducts$ = combineLatest([
     this.#cartProductIds$,
-    this.#productsService.products$
+    this.#productsService.products$,
   ]).pipe(
     map(([ids, allProducts]) =>
-      ids.map(id => allProducts.find(p => p.id === id)).filter((p): p is Product => !!p)
-    )
+      ids
+        .map((id) => allProducts.find((p) => p.id === id))
+        .filter((p): p is Product => !!p),
+    ),
   );
 
   getCartProducts(): Observable<Product[]> {
     return this.#http.get<Product[]>(this.#baseUrl).pipe(
-      tap(products => {
-        const ids = products.map(p => p.id);
+      tap((products) => {
+        const ids = products.map((p) => p.id);
         this.#cartProductIds$.next(ids);
 
         this.#productsService.addProducts(products);
-      })
+      }),
     );
   }
 
@@ -39,7 +41,7 @@ export class CheckoutService {
       tap(() => {
         const currentIds = this.#cartProductIds$.getValue();
         this.#cartProductIds$.next([...currentIds, product.id]);
-      })
+      }),
     );
   }
 
@@ -48,7 +50,7 @@ export class CheckoutService {
       tap(() => {
         const currentIds = this.#cartProductIds$.getValue();
         this.#cartProductIds$.next(currentIds.filter((_, i) => i !== index));
-      })
+      }),
     );
   }
 }
